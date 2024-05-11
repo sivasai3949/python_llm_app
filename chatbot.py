@@ -1,23 +1,23 @@
 import streamlit as st
-import replicate
+import open_infra
 import os
 
 # App title
 st.set_page_config(page_title="🦙💬 Llama 2 Chatbot")
 
-# Replicate Credentials
+# Open Infra Credentials
 with st.sidebar:
     st.title('🦙💬 Llama 2 Chatbot')
-    if 'DEEP_INFRA_API_TOKEN' in st.secrets:
+    if 'OPEN_INFRA_API_TOKEN' in st.secrets:
         st.success('API key already provided!', icon='✅')
-        deep_infra_api = st.secrets['DEEP_INFRA_API_TOKEN']
+        open_infra_api = st.secrets['OPEN_INFRA_API_TOKEN']
     else:
-        deep_infra_api = st.text_input('Enter Deep Infra API token:', type='password')
-        if not (deep_infra_api.startswith('di_') and len(deep_infra_api) == 40):
+        open_infra_api = st.text_input('Enter Open Infra API token:', type='password')
+        if not (open_infra_api.startswith('oi_') and len(open_infra_api) == 40):
             st.warning('Please enter your credentials!', icon='⚠️')
         else:
             st.success('Proceed to entering your prompt message!', icon='👉')
-    os.environ['DEEP_INFRA_API_TOKEN'] = deep_infra_api
+    os.environ['OPEN_INFRA_API_TOKEN'] = open_infra_api
 
     st.subheader('Models and parameters')
     selected_model = st.sidebar.selectbox('Choose a Llama2 model', ['Llama2-7B', 'Llama2-13B'], key='selected_model')
@@ -51,19 +51,19 @@ def generate_llama2_response(prompt_input):
             string_dialogue += "User: " + dict_message["content"] + "\n\n"
         else:
             string_dialogue += "Assistant: " + dict_message["content"] + "\n\n"
-    output = replicate.run(llm, 
+    output = open_infra.run(llm, 
                            input={"prompt": f"{string_dialogue} {prompt_input} Assistant: ",
                                   "temperature":temperature, "top_p":top_p, "max_length":max_length, "repetition_penalty":1}, 
-                           api_key=deep_infra_api)
+                           api_key=open_infra_api)
     return output
 
 # User-provided prompt
-if prompt := st.chat_input(disabled=not deep_infra_api):
+if prompt := st.chat_input(disabled=not open_infra_api):
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.write(prompt)
 
-# Generate a new response if last message is not from assistant
+# Generate a new response if the last message is not from the assistant
 if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
@@ -76,4 +76,3 @@ if st.session_state.messages[-1]["role"] != "assistant":
             placeholder.markdown(full_response)
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
-
