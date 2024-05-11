@@ -77,4 +77,3 @@ if st.session_state.messages[-1]["role"] != "assistant":
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
 
-for this code  i want to replace with the deep infra api key is it possible or not
