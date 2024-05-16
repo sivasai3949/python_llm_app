@@ -44,7 +44,7 @@ def clear_chat_history():
 st.sidebar.button('Clear Chat History', on_click=clear_chat_history)
 
 # Function for generating LLaMA2 response. Refactored from https://github.com/a16z-infra/llama2-chatbot
-def generate_llama2_response(prompt_input, num_points=10):
+def generate_llama2_response(prompt_input):
     string_dialogue = "You are a helpful assistant. You do not respond as 'User' or pretend to be 'User'. You only respond once as 'Assistant'."
     for dict_message in st.session_state.messages:
         if dict_message["role"] == "user":
@@ -64,15 +64,11 @@ def generate_llama2_response(prompt_input, num_points=10):
     
     full_response = ''.join(response)
     
-    # Split the response into individual points
-    points = full_response.split("\n\n")
-    
-    # If the number of points is less than the desired number, prompt for more information
-    if len(points) < num_points:
-        return "I apologize, but I couldn't generate enough points. Could you provide more information or ask a more specific question?"
-    
-    # Concatenate the first 'num_points' points into a single string
-    return "\n\n".join(points[:num_points])
+    # Check if the response contains enough information
+    if "roadmap" in prompt_input.lower() or "steps" in prompt_input.lower():
+        return full_response
+    else:
+        return "I apologize, but I couldn't generate a comprehensive roadmap. Could you provide more information or ask a more specific question?"
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not replicate_api):
