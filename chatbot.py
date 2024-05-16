@@ -64,11 +64,7 @@ def generate_llama2_response(prompt_input):
     
     full_response = ''.join(response)
     
-    # Check if the response contains enough information
-    if "roadmap" in prompt_input.lower() or "steps" in prompt_input.lower():
-        return full_response
-    else:
-        return "I apologize, but I couldn't generate a comprehensive roadmap. Could you provide more information or ask a more specific question?"
+    return full_response
 
 # User-provided prompt
 if prompt := st.chat_input(disabled=not replicate_api):
